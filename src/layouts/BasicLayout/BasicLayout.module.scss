@@ -62,14 +62,15 @@
   }
 
   .basicLayoutInner {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
     overflow: auto;
   }
 
   .basicLayoutContent {
-    margin: var(--space-lg);
     padding: var(--space-lg);
-    background: var(--bg-color);
-    border-radius: $border-radius-lg;
   }
 
   .basicLayoutMobileDrawer {
@@ -83,7 +84,6 @@
 @media (min-width: 768px) {
   .basicLayout {
     .basicLayoutContent {
-      margin: var(--space-xl);
       padding: var(--space-xl);
     }
   }
@@ -97,7 +97,6 @@
     }
 
     .basicLayoutContent {
-      margin: var(--space-xl) auto;
       padding: var(--space-xl);
       max-width: var(--content-max-width);
     }
@@ -123,7 +122,6 @@
     }
 
     .basicLayoutContent {
-      margin: var(--space-sm);
       padding: var(--space-md);
     }
   }

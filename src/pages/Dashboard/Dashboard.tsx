@@ -54,7 +54,7 @@ function Dashboard() {
   );
 
   return (
-    <div>
+    <div className={styles.dashboard}>
       <Row gutter={[16, 16]}>
         {stats.map((stat, index) => (
           <Col key={stat.title} xs={24} sm={12} lg={6}>

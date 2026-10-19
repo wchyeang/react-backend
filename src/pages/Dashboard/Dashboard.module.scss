@@ -1,3 +1,10 @@
+.dashboard {
+  min-height: 100%;
+  background: var(--bg-color);
+  border-radius: 0.8rem;
+  padding: 1.6rem;
+}
+
 .statCard {
   display: flex;
   justify-content: space-between;
@@ -7,53 +14,53 @@
 .statInfo {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0.4rem;
 }
 
 .statTitle {
-  font-size: 14px;
+  font-size: 1.4rem;
   color: #8c8c8c;
 }
 
 .statValue {
-  font-size: 28px;
+  font-size: 2.8rem;
   font-weight: 600;
   line-height: 1.2;
 }
 
 .statGrowth {
-  font-size: 13px;
+  font-size: 1.3rem;
   font-weight: 500;
 }
 
 .statIcon {
-  width: 56px;
-  height: 56px;
-  border-radius: 12px;
+  width: 5.6rem;
+  height: 5.6rem;
+  border-radius: 1.2rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 26px;
+  font-size: 2.6rem;
   flex-shrink: 0;
 }
 
 .performanceList {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 2rem;
 }
 
 .performanceItem {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 0.6rem;
 }
 
 .perfHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 13px;
+  font-size: 1.3rem;
 }
 
 .perfValue {

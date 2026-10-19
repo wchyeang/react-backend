@@ -13,6 +13,7 @@ dist-ssr
 assets
 *.local
 .env
+html.meta.json*
 
 # Editor directories and files
 .vscode/*
