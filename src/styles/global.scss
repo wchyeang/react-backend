@@ -1,0 +1,145 @@
+@use 'sass:color';
+
+// ========== 全局样式 ==========
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: $font-family;
+  font-size: var(--text-base);
+  color: var(--text-color);
+  background: var(--bg-color-secondary);
+  line-height: 1.5715;
+  transition: $transition-base;
+}
+
+#root {
+  height: 100vh;
+}
+
+a {
+  color: $primary-color;
+  text-decoration: none;
+
+  &:hover {
+    color: color.adjust($primary-color, $lightness: 10%);
+  }
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+// 滚动条
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ==========================================
+   Toolbar Chip — 顶部工具栏胶囊（对齐 vue3-backend MainLayout）
+   ========================================== */
+.toolbar-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 8px;
+  font-size: var(--text-sm);
+  border-radius: 18px;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+@media (max-width: 575px) {
+  .toolbar-chip {
+    .chip-label,
+    .chip-caret {
+      display: none;
+    }
+  }
+}
+
+[data-theme='light'] .toolbar-chip {
+  background: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  color: rgba(0, 0, 0, 0.75);
+}
+
+[data-theme='light'] .toolbar-chip:hover {
+  background: rgba(0, 0, 0, 0.06);
+  border-color: #1677ff;
+  color: #1677ff;
+}
+
+[data-theme='dark'] .toolbar-chip {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+[data-theme='dark'] .toolbar-chip:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #1677ff;
+  color: #1677ff;
+}
+
+.toolbar-chip .chip-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  color: inherit;
+  opacity: 0.65;
+}
+
+.toolbar-chip:hover .chip-icon {
+  opacity: 1;
+}
+
+.toolbar-chip .chip-label {
+  font-weight: 500;
+}
+
+.toolbar-chip .chip-caret {
+  font-size: 12px;
+  opacity: 0.45;
+  transition: transform 0.2s ease;
+}
+
+/* ========== 桌面/平板：Pill 恢复正常尺寸 ========== */
+@media (min-width: 576px) {
+  .toolbar-chip {
+    height: 32px;
+    padding: 0 12px;
+    font-size: var(--text-base);
+    border-radius: 16px;
+    gap: 6px;
+  }
+}

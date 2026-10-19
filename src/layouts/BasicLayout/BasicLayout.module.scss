@@ -1,0 +1,130 @@
+.basicLayout {
+  height: 100vh;
+
+  .basicLayoutSider {
+    overflow: auto;
+    height: 100vh;
+
+    :global(.ant-layout-sider-trigger) {
+      background: inherit !important;
+      color: var(--text-color);
+    }
+  }
+
+  .basicLayoutLogo {
+    height: var(--header-height);
+    @include flex-center;
+    font-size: var(--text-lg);
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 var(--space-md);
+  }
+
+  .basicLayoutHeader {
+    padding: 0 var(--space-lg);
+    @include flex-between;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  }
+
+  .basicLayoutHeaderLeft {
+    @include flex-align-center;
+    gap: var(--space-sm);
+  }
+
+  .basicLayoutHeaderRight {
+    @include flex-align-center;
+    gap: var(--space-sm);
+    margin-left: auto;
+  }
+
+  .basicLayoutHamburger {
+    font-size: 18px;
+    min-width: var(--touch-target-min);
+    min-height: var(--touch-target-min);
+  }
+
+  .basicLayoutMobileLogo {
+    font-size: var(--text-lg);
+    font-weight: 600;
+  }
+
+  .basicLayoutUser {
+    cursor: pointer;
+    padding: 0 var(--space-xs);
+    user-select: none;
+    white-space: nowrap;
+
+    &:hover {
+      color: var(--primary-color);
+    }
+  }
+
+  .basicLayoutInner {
+    overflow: auto;
+  }
+
+  .basicLayoutContent {
+    margin: var(--space-lg);
+    padding: var(--space-lg);
+    background: var(--bg-color);
+    border-radius: $border-radius-lg;
+  }
+
+  .basicLayoutMobileDrawer {
+    :global(.ant-drawer-body) {
+      padding: 0;
+    }
+  }
+}
+
+/* ========== 平板 (md): ≥ 768px ========== */
+@media (min-width: 768px) {
+  .basicLayout {
+    .basicLayoutContent {
+      margin: var(--space-xl);
+      padding: var(--space-xl);
+    }
+  }
+}
+
+/* ========== 桌面 (lg): ≥ 992px ========== */
+@media (min-width: 992px) {
+  .basicLayout {
+    .basicLayoutHeader {
+      padding: 0 var(--space-xl);
+    }
+
+    .basicLayoutContent {
+      margin: var(--space-xl) auto;
+      padding: var(--space-xl);
+      max-width: var(--content-max-width);
+    }
+  }
+}
+
+/* ========== 大桌面 (xl): ≥ 1200px ========== */
+@media (min-width: 1200px) {
+  .basicLayout {
+    .basicLayoutContent {
+      max-width: var(--content-max-width-xl);
+    }
+  }
+}
+
+/* ========== 手机 (xs): < 576px ========== */
+@media (max-width: 575px) {
+  .basicLayout {
+    .basicLayoutHeader {
+      padding: 0 var(--space-md);
+      padding-left: max(var(--space-md), var(--safe-left));
+      padding-right: max(var(--space-md), var(--safe-right));
+    }
+
+    .basicLayoutContent {
+      margin: var(--space-sm);
+      padding: var(--space-md);
+    }
+  }
+}

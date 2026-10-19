@@ -1,0 +1,59 @@
+// ========== 主题 CSS 变量 ==========
+
+:root {
+  // 背景色
+  --bg-color: #ffffff;
+  --bg-color-secondary: #f5f5f5;
+  --bg-color-elevated: #ffffff;
+
+  // 文字色
+  --text-color: rgba(0, 0, 0, 0.88);
+  --text-color-secondary: rgba(0, 0, 0, 0.65);
+  --text-color-disabled: rgba(0, 0, 0, 0.25);
+
+  // 边框色
+  --border-color: #d9d9d9;
+  --border-color-light: #f0f0f0;
+
+  // 侧边栏
+  --sidebar-bg: #001529;
+  --sidebar-text: rgba(255, 255, 255, 0.65);
+  --sidebar-text-active: #ffffff;
+
+  // 头部
+  --header-bg: #ffffff;
+  --header-text: rgba(0, 0, 0, 0.88);
+
+  // 阴影
+  --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --box-shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme='dark'] {
+  // 背景色
+  --bg-color: #141414;
+  --bg-color-secondary: #1f1f1f;
+  --bg-color-elevated: #1f1f1f;
+
+  // 文字色
+  --text-color: rgba(255, 255, 255, 0.85);
+  --text-color-secondary: rgba(255, 255, 255, 0.45);
+  --text-color-disabled: rgba(255, 255, 255, 0.25);
+
+  // 边框色
+  --border-color: #434343;
+  --border-color-light: #303030;
+
+  // 侧边栏
+  --sidebar-bg: #141414;
+  --sidebar-text: rgba(255, 255, 255, 0.45);
+  --sidebar-text-active: #ffffff;
+
+  // 头部
+  --header-bg: #1f1f1f;
+  --header-text: rgba(255, 255, 255, 0.85);
+
+  // 阴影
+  --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.32);
+  --box-shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.48);
+}

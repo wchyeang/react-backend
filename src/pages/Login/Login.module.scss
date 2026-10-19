@@ -1,0 +1,730 @@
+// ==========================================
+// iPhone 毛玻璃登录页 — Glassmorphism Login
+// ==========================================
+
+@use 'sass:list';
+@use 'sass:math';
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// ========== 全屏容器 ==========
+.login {
+  position: relative;
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background: #080c14;
+  color: #fff;
+
+  [data-theme='light'] & {
+    background: #e8ecf1;
+    color: $text-color;
+  }
+}
+
+// ==========================================
+//  背景光球 — 各自独立 blur，不叠成一团
+// ==========================================
+.bgOrbs {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@mixin orb {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform;
+}
+
+// 左上蓝色
+.bgOrb1 {
+  @include orb;
+  width: 520px;
+  height: 520px;
+  top: -20%;
+  left: -8%;
+  background: radial-gradient(
+    circle at 40% 40%,
+    rgba(59, 130, 246, 0.9),
+    rgba(37, 99, 235, 0.4) 50%,
+    transparent 70%
+  );
+  filter: blur(70px);
+  animation: orbDrift1 12s ease-in-out infinite;
+}
+
+// 右侧中部紫粉 — 在卡片后面
+.bgOrb2 {
+  @include orb;
+  width: 420px;
+  height: 420px;
+  top: 15%;
+  right: -5%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(139, 92, 246, 0.85),
+    rgba(236, 72, 153, 0.35) 55%,
+    transparent 72%
+  );
+  filter: blur(50px);
+  animation: orbDrift2 14s ease-in-out infinite;
+  animation-delay: -4s;
+}
+
+// 右下蓝青 — 在卡片后面下方
+.bgOrb3 {
+  @include orb;
+  width: 380px;
+  height: 380px;
+  bottom: -15%;
+  right: 15%;
+  background: radial-gradient(
+    circle at 50% 40%,
+    rgba(6, 182, 212, 0.8),
+    rgba(59, 130, 246, 0.35) 55%,
+    transparent 70%
+  );
+  filter: blur(60px);
+  animation: orbDrift3 15s ease-in-out infinite;
+  animation-delay: -8s;
+}
+
+// 左侧下方琥珀
+.bgOrb4 {
+  @include orb;
+  width: 320px;
+  height: 320px;
+  bottom: 10%;
+  left: -5%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(245, 158, 11, 0.65),
+    rgba(239, 68, 68, 0.3) 55%,
+    transparent 70%
+  );
+  filter: blur(80px);
+  animation: orbDrift4 16s ease-in-out infinite;
+  animation-delay: -10s;
+}
+
+// 卡片正后方 — 清晰形状，让毛玻璃起作用
+.bgOrb5 {
+  @include orb;
+  width: 340px;
+  height: 340px;
+  top: 20%;
+  right: 0;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(99, 102, 241, 0.7),
+    rgba(139, 92, 246, 0.3) 55%,
+    transparent 70%
+  );
+  filter: blur(0px); // 不模糊！卡片 backdrop-filter 会模糊它
+  animation: orbDrift5 10s ease-in-out infinite;
+  animation-delay: -2s;
+}
+
+@keyframes orbDrift1 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(35px, 25px) scale(1.1);
+  }
+  66% {
+    transform: translate(-18px, -12px) scale(0.94);
+  }
+}
+@keyframes orbDrift2 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(-45px, -20px) scale(1.08);
+  }
+  66% {
+    transform: translate(25px, 35px) scale(0.93);
+  }
+}
+@keyframes orbDrift3 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(-25px, -35px) scale(1.12);
+  }
+  66% {
+    transform: translate(35px, 18px) scale(0.93);
+  }
+}
+@keyframes orbDrift4 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(50px, -15px) scale(1.06);
+  }
+  66% {
+    transform: translate(-35px, -25px) scale(0.96);
+  }
+}
+@keyframes orbDrift5 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-22px, -18px) scale(1.18);
+  }
+}
+
+// ==========================================
+//  光点粒子 — 加大尺寸、加发光、更明显
+// ==========================================
+.particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.particle {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow:
+    0 0 4px 1px rgba(255, 255, 255, 0.5),
+    0 0 10px 3px rgba(147, 197, 253, 0.3);
+  animation: particleFloat 5s ease-in-out infinite;
+
+  [data-theme='light'] & {
+    background: rgba(37, 99, 235, 0.7);
+    box-shadow:
+      0 0 4px 1px rgba(37, 99, 235, 0.3),
+      0 0 8px 2px rgba(37, 99, 235, 0.15);
+  }
+}
+
+// 20 个粒子分散在全屏
+$particle-positions: (
+  (8%, 12%),
+  (22%, 6%),
+  (40%, 85%),
+  (55%, 10%),
+  (72%, 72%),
+  (85%, 5%),
+  (93%, 88%),
+  (12%, 55%),
+  (28%, 40%),
+  (48%, 60%),
+  (62%, 35%),
+  (78%, 50%),
+  (88%, 25%),
+  (15%, 78%),
+  (35%, 22%),
+  (52%, 92%),
+  (68%, 18%),
+  (82%, 65%),
+  (8%, 32%),
+  (95%, 45%)
+);
+
+@for $i from 1 through 20 {
+  $pos: list.nth($particle-positions, $i);
+  .particle#{$i} {
+    left: list.nth($pos, 1);
+    top: list.nth($pos, 2);
+    animation-delay: #{$i * -0.3}s;
+    animation-duration: #{4 + math.random(4)}s;
+    width: #{3 + math.random(3)}px;
+    height: #{3 + math.random(3)}px;
+  }
+}
+
+@keyframes particleFloat {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.3;
+  }
+  30% {
+    transform: translateY(-18px) scale(1.6);
+    opacity: 0.9;
+  }
+  60% {
+    transform: translateY(10px) scale(0.7);
+    opacity: 0.2;
+  }
+  80% {
+    transform: translateY(-6px) scale(1.2);
+    opacity: 0.6;
+  }
+}
+
+// ==========================================
+//  左侧品牌区 — 55%
+// ==========================================
+.loginLeft {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 55%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px;
+}
+
+.brandContent {
+  text-align: center;
+  animation: brandEnter 0.8s ease-out;
+}
+
+.brandLogo {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 24px;
+  filter: drop-shadow(0 8px 24px rgba(79, 140, 255, 0.4));
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.brandName {
+  margin: 0 0 12px;
+  font-size: 36px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.5px;
+
+  [data-theme='light'] & {
+    color: #0f172a;
+  }
+}
+
+.brandDesc {
+  margin: 0 0 16px;
+  font-size: $font-size-base;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 1px;
+
+  [data-theme='light'] & {
+    color: rgba(15, 23, 42, 0.45);
+  }
+}
+
+.brandTagline {
+  margin: 0;
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.28);
+  line-height: 1.6;
+
+  [data-theme='light'] & {
+    color: rgba(15, 23, 42, 0.3);
+  }
+}
+
+// ==========================================
+//  右侧表单区 — 45%
+// ==========================================
+.loginRight {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xl;
+}
+
+// ==========================================
+//  iPhone 毛玻璃卡片
+// ==========================================
+.glassCard {
+  position: relative;
+  width: 420px;
+  max-width: 100%;
+  padding: 44px 40px;
+  border-radius: 20px;
+
+  // === 毛玻璃核心 ===
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(30px) saturate(200%);
+  -webkit-backdrop-filter: blur(30px) saturate(200%);
+
+  // === 玻璃边框：半透明 + 顶部高光 ===
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+
+  [data-theme='light'] & {
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+  }
+
+  // === 入场动画 ===
+  animation: cardEnter 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.15s;
+
+  // === hover 微悬浮 ===
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 16px 48px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+
+    [data-theme='light'] & {
+      box-shadow:
+        0 16px 48px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+    }
+  }
+}
+
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes brandEnter {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+// ========== 卡片头部 ==========
+.cardHeader {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.loginTitle {
+  margin-bottom: 8px !important;
+  font-weight: 700 !important;
+  color: #fff !important;
+
+  [data-theme='light'] & {
+    color: #0f172a !important;
+  }
+}
+
+.loginSubtitle {
+  margin: 0;
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.4);
+
+  [data-theme='light'] & {
+    color: rgba(15, 23, 42, 0.4);
+  }
+}
+
+// ========== 表单项 stagger 入场 ==========
+.loginForm {
+  > * {
+    animation: itemEnter 0.5s ease-out both;
+
+    &:nth-child(1) {
+      animation-delay: 0.3s;
+    }
+    &:nth-child(2) {
+      animation-delay: 0.4s;
+    }
+    &:nth-child(3) {
+      animation-delay: 0.5s;
+    }
+    &:nth-child(4) {
+      animation-delay: 0.6s;
+    }
+  }
+}
+
+@keyframes itemEnter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ========== 毛玻璃输入框 ==========
+.glassInput {
+  background: rgba(255, 255, 255, 0.07) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 12px !important;
+  color: #fff !important;
+  transition: all 0.3s ease !important;
+
+  [data-theme='light'] & {
+    background: rgba(0, 0, 0, 0.03) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    color: $text-color !important;
+  }
+
+  input {
+    background: transparent !important;
+    color: inherit !important;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.3) !important;
+      [data-theme='light'] & {
+        color: rgba(0, 0, 0, 0.25) !important;
+      }
+    }
+  }
+
+  .ant-input-prefix {
+    color: rgba(255, 255, 255, 0.35) !important;
+    [data-theme='light'] & {
+      color: rgba(0, 0, 0, 0.3) !important;
+    }
+  }
+
+  // 聚焦发光
+  &:hover,
+  &:focus-within {
+    border-color: rgba(99, 102, 241, 0.5) !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12) !important;
+    transform: scale(1.01);
+  }
+}
+
+// ========== 表单行 ==========
+.formRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+
+  .ant-form-item {
+    margin-bottom: 0;
+  }
+
+  .ant-checkbox-wrapper {
+    color: rgba(255, 255, 255, 0.55) !important;
+    [data-theme='light'] & {
+      color: rgba(0, 0, 0, 0.5) !important;
+    }
+  }
+}
+
+.forgotLink {
+  font-size: $font-size-sm;
+  color: rgba(129, 140, 248, 0.9);
+  text-decoration: none;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #a5b4fc;
+  }
+}
+
+// ========== 提交按钮 ==========
+.submitBtn {
+  height: 48px;
+  border-radius: 12px;
+  font-size: $font-size-base;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+
+  background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+  border: none !important;
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: linear-gradient(135deg, #818cf8, #a78bfa) !important;
+    box-shadow: 0 6px 28px rgba(99, 102, 241, 0.55);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// ==========================================
+//  响应式：≤1024px 上下堆叠，品牌区变顶部紧凑条
+// ==========================================
+@media (max-width: 1024px) {
+  .login {
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .loginLeft {
+    flex: 0 0 auto;
+    padding: 38px 38px 0;
+  }
+
+  .brandContent {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 19px;
+  }
+
+  .brandLogo {
+    width: 36px;
+    height: 36px;
+    margin: 0;
+  }
+
+  .brandName {
+    margin: 0;
+  }
+
+  .brandDesc {
+    display: none;
+  }
+
+  .brandTagline {
+    display: none;
+  }
+
+  .loginRight {
+    flex: 0 0 auto;
+    padding: 19px 38px 38px;
+  }
+
+  .glassCard {
+    width: 100%;
+    max-width: 420px;
+    padding: 58px 45px;
+  }
+}
+
+// ==========================================
+//  响应式：≤768px 进一步紧凑
+// ==========================================
+@media (max-width: 768px) {
+  .loginLeft {
+    padding: 26px 26px 0;
+  }
+
+  .brandLogo {
+    width: 28px;
+    height: 28px;
+  }
+
+  .loginRight {
+    padding: 26px;
+  }
+
+  .glassCard {
+    padding: 45px 32px;
+  }
+}
+
+// ==========================================
+//  右上角工具栏 — 对齐 vue3-backend Login
+// ==========================================
+.loginToolbar {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 10;
+}
+
+.toolbarGlass {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+
+  [data-theme='light'] & {
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.langChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+
+  [data-theme='light'] & {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    color: #0f172a;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.22);
+    border-color: rgba(255, 255, 255, 0.3);
+
+    [data-theme='light'] & {
+      background: rgba(255, 255, 255, 0.9);
+      border-color: rgba(99, 102, 241, 0.5);
+    }
+  }
+}
+
+.chipIcon {
+  font-size: 16px;
+  color: inherit;
+  opacity: 0.7;
+}
+
+.chipLabel {
+  line-height: 1;
+}
+
+.chipCaret {
+  font-size: 12px;
+  opacity: 0.5;
+}

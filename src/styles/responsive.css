@@ -1,0 +1,41 @@
+/* ==========================================
+   响应式全局规则 — 移动优先
+   断点对齐 antd useBreakpoint:
+     xs <  576px   sm ≥  576px   md ≥  768px
+     lg ≥  992px   xl ≥ 1200px   xxl ≥ 1600px
+   ========================================== */
+
+/* ===== 触摸设备全局优化 ===== */
+@media (hover: none) and (pointer: coarse) {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* ===== 平板 (md): ≥ 768px ===== */
+@media (min-width: 768px) {
+  :root {
+    --header-height: var(--header-height-tablet);
+  }
+}
+
+/* ===== 桌面 (lg): ≥ 992px ===== */
+@media (min-width: 992px) {
+  :root {
+    --header-height: var(--header-height-desktop);
+  }
+}
+
+/* ===== 打印样式 ===== */
+@media print {
+  .ant-layout-sider,
+  .ant-layout-header,
+  .trigger {
+    display: none !important;
+  }
+
+  .ant-layout-content {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}

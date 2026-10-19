@@ -1,0 +1,72 @@
+/* ==========================================
+   设计令牌 — Design Tokens
+   企业级 rem 体系，1rem ≈ 10px（4px 基准阶梯）
+   与 Ant Design 5 设计规范对齐
+   ========================================== */
+
+:root {
+  /*
+    根字号基准：1rem = 10px（10px 阶梯便于换算）。
+    - 第 1 行 62.5%：兜底，老浏览器不支持在 font-size 中解析 rem 时使用；
+    - 第 2 行 calc(1rem * 0.625)：以"用户浏览器默认字号"为基准，
+      始终保持 10px 换算的同时，随用户字号偏好（含文本缩放辅助功能）成比例变化。
+      这样 rem 写出的尺寸是"可预期的"，且不会像绝对写死一样拒绝缩放。
+  */
+  font-size: 62.5%;
+  font-size: calc(1rem * 0.625);
+
+  /* -------- 间距阶梯 (4px base) -------- */
+  --space-xs: 0.4rem;
+  /* 4px */
+  --space-sm: 0.8rem;
+  /* 8px */
+  --space-md: 1.2rem;
+  /* 12px */
+  --space-lg: 1.6rem;
+  /* 16px */
+  --space-xl: 2.4rem;
+  /* 24px */
+  --space-2xl: 3.2rem;
+  /* 32px */
+  --space-3xl: 4.8rem;
+  /* 48px */
+
+  /* -------- 字体阶梯 -------- */
+  --text-xs: 1rem;
+  /* 10px */
+  --text-sm: 1.2rem;
+  /* 12px */
+  --text-base: 1.4rem;
+  /* 14px - antd body 默认 */
+  --text-md: 1.6rem;
+  /* 16px */
+  --text-lg: 1.8rem;
+  /* 18px */
+  --text-xl: 2rem;
+  /* 20px */
+  --text-2xl: 2.4rem;
+  /* 24px */
+  --text-3xl: 3.2rem;
+  /* 32px */
+
+  /* -------- 布局令牌 -------- */
+  --header-height: 48px;
+  --header-height-mobile: 48px;
+  --header-height-tablet: 56px;
+  --header-height-desktop: 64px;
+
+  --sider-width: 200px;
+  --sider-collapsed-width: 80px;
+
+  --content-max-width: 1200px;
+  --content-max-width-xl: 1400px;
+
+  /* WCAG 2.5.5 最小触摸目标 */
+  --touch-target-min: 44px;
+
+  /* 安全区 (iPhone 刘海屏 / 底部指示条) */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}

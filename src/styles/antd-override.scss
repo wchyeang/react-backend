@@ -1,0 +1,21 @@
+// ========== Antd 组件样式覆盖 ==========
+
+// 侧边栏菜单样式覆盖
+.ant-layout-sider {
+  .ant-menu-dark {
+    background: var(--sidebar-bg);
+  }
+}
+
+// 顶栏样式覆盖
+.ant-layout-header {
+  height: var(--header-height);
+  line-height: var(--header-height);
+  background: var(--header-bg) !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+// 内容区
+.ant-layout-content {
+  min-height: 280px;
+}
