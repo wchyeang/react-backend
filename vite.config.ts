@@ -19,8 +19,24 @@ function removeMockWorkerFromBuild(mode: string): Plugin {
   };
 }
 
+/** 非 Mock 模式下，Cloudflare 专用的 _redirects 文件也从产物中移除 */
+function removeRedirectsFromBuild(mode: string): Plugin {
+  const env = loadEnv(mode, process.cwd(), 'VITE_');
+  return {
+    name: 'remove-redirects',
+    apply: 'build',
+    closeBundle() {
+      if (env.VITE_USE_MOCK === 'true') return;
+      const file = path.resolve(__dirname, 'dist', '_redirects');
+      if (existsSync(file)) {
+        unlinkSync(file);
+      }
+    },
+  };
+}
+
 export default defineConfig(({ mode }) => ({
-  plugins: [react(), removeMockWorkerFromBuild(mode)],
+  plugins: [react(), removeMockWorkerFromBuild(mode), removeRedirectsFromBuild(mode)],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
