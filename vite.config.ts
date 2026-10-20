@@ -1,14 +1,16 @@
-import { defineConfig, type Plugin } from 'vite';
+import { defineConfig, type Plugin, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'node:path';
 import { existsSync, unlinkSync } from 'node:fs';
 
-/** 构建完成后从产物中移除 MSW 的 Service Worker 脚本，避免把它打进生产包 */
-function removeMockWorkerFromBuild(): Plugin {
+/** 非 Mock 模式下，构建完成后从产物中移除 MSW 的 Service Worker 脚本 */
+function removeMockWorkerFromBuild(mode: string): Plugin {
+  const env = loadEnv(mode, process.cwd(), 'VITE_');
   return {
     name: 'remove-mock-worker',
     apply: 'build',
     closeBundle() {
+      if (env.VITE_USE_MOCK === 'true') return;
       const file = path.resolve(__dirname, 'dist', 'mockServiceWorker.js');
       if (existsSync(file)) {
         unlinkSync(file);
@@ -17,8 +19,8 @@ function removeMockWorkerFromBuild(): Plugin {
   };
 }
 
-export default defineConfig({
-  plugins: [react(), removeMockWorkerFromBuild()],
+export default defineConfig(({ mode }) => ({
+  plugins: [react(), removeMockWorkerFromBuild(mode)],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
@@ -49,4 +51,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

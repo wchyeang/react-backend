@@ -146,6 +146,10 @@ function Login() {
                 {submitLabel}
               </Button>
             </Form.Item>
+
+            {import.meta.env.VITE_USE_MOCK === 'true' && (
+              <div className={styles.demoHint}>演示账号：admin / admin</div>
+            )}
           </Form>
         </div>
       </div>

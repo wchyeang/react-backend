@@ -578,6 +578,21 @@ $particle-positions: (
   }
 }
 
+// ========== Demo 演示账号提示 ==========
+.demoHint {
+  text-align: center;
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.45);
+  padding: $spacing-sm 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: $spacing-xs;
+
+  [data-theme='light'] & {
+    color: rgba(0, 0, 0, 0.35);
+    border-top-color: rgba(0, 0, 0, 0.08);
+  }
+}
+
 // ==========================================
 //  响应式：≤1024px 上下堆叠，品牌区变顶部紧凑条
 // ==========================================
