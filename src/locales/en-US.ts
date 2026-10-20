@@ -86,6 +86,23 @@ export default {
     reset: 'Reset',
     back: 'Back',
   },
+  error: {
+    unknown: 'System busy, please try again later',
+    serviceUnavailable: 'Service temporarily unavailable, please try again later',
+    network: 'Network error, please check your connection',
+    forbidden: 'Access denied',
+    notFound: 'Resource not found',
+    serverError: 'Server error, please try again later',
+    http: {
+      400: 'Invalid request parameters',
+      403: 'Access denied',
+      404: 'Resource not found',
+      500: 'Server error, please try again later',
+      502: 'Service temporarily unavailable, please try again later',
+      503: 'Service under maintenance',
+      504: 'Gateway timeout, please try again later',
+    },
+  },
   notFound: {
     title: 'Under Development',
     subtitle: 'This page is under development, please stay tuned',

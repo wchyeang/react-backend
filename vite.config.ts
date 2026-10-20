@@ -32,7 +32,7 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3000,
+    port: Number(process.env.VITE_DEV_PORT) || 3000,
     open: true,
   },
   build: {

@@ -1,0 +1,54 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build output (由构建阶段生成，不需要从宿主机复制)
+dist
+dist-ssr
+assets
+
+# Version control
+.git
+.gitattributes
+.gitignore
+
+# IDE / Editor
+.vscode
+.idea
+.trae
+*.swp
+*.swo
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment (通过构建参数注入，不打包进镜像)
+.env
+.env.*
+
+# Test & Coverage
+coverage
+test-results.json
+test-results.html
+__tests__
+
+# CI / CD
+.github
+.gitlab-ci.yml
+Jenkinsfile
+
+# Documentation
+README.md
+CHANGELOG.md
+docs
+
+# Misc
+*.log
+*.md
+.cache
+.tmp

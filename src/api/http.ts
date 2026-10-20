@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { AxiosRequestConfig, AxiosResponse } from 'axios';
-import { message } from 'antd';
 import { authStorage } from '@/utils/authStorage';
+import { AppError } from '@/types/error';
 import type { ApiResponse } from '@/types/api';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -84,11 +84,17 @@ function retryAfterRefresh(config: AxiosRequestConfig) {
   });
 }
 
-function handleBusinessError(code: number, error: Error) {
-  if (typeof window !== 'undefined') {
-    void message.error(error.message || '请求失败');
+function throwAppError(code: number, serverMessage?: string): never {
+  // HTTP 5xx
+  if (code >= 500) {
+    throw new AppError('服务暂时不可用，请稍后重试', code, 'http', code);
   }
-  void code;
+  // HTTP 4xx（401 在上层由 token 刷新处理）
+  if (code >= 400) {
+    throw new AppError(serverMessage || '请求失败', code, 'http', code);
+  }
+  // 业务错误码（后端 code !== 0）
+  throw new AppError(serverMessage || '系统繁忙，请稍后重试', code, 'business');
 }
 
 instance.interceptors.response.use(
@@ -101,8 +107,7 @@ instance.interceptors.response.use(
     if (apiData.code === 401 && !isInWhiteList(config.url)) {
       return retryAfterRefresh(config) as unknown as Promise<AxiosResponse>;
     }
-    handleBusinessError(apiData.code, new Error(apiData.message));
-    return Promise.reject(new Error(apiData.message));
+    throwAppError(apiData.code, apiData.message);
   },
   (error) => {
     const status = error.response?.status;
@@ -110,8 +115,11 @@ instance.interceptors.response.use(
     if (status === 401 && !isInWhiteList(config?.url)) {
       return retryAfterRefresh(config) as unknown as Promise<AxiosResponse>;
     }
-    handleBusinessError(status, error);
-    return Promise.reject(error);
+    // 网络层错误（无任何响应）
+    if (!error.response) {
+      throw new AppError('网络连接失败，请检查网络', 0, 'network');
+    }
+    throwAppError(status ?? 0, error.response?.data?.message);
   },
 );
 

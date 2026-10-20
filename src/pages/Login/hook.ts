@@ -4,6 +4,7 @@ import { useIntl } from 'react-intl';
 import { message as antdMessage } from 'antd';
 import { useAppDispatch } from '@/store/hooks';
 import { loginThunk } from '@/store/slices/authSlice';
+import { AppError } from '@/types/error';
 import type { FormProps } from 'antd';
 
 interface LoginFormValues {
@@ -23,8 +24,18 @@ export function useLogin() {
         await dispatch(loginThunk(values));
         const redirect = searchParams.get('redirect') || '/dashboard';
         navigate(redirect, { replace: true });
-      } catch {
-        antdMessage.error(intl.formatMessage({ id: 'login.error' }));
+      } catch (error) {
+        if (error instanceof AppError) {
+          if (error.isSystemError) {
+            antdMessage.error(intl.formatMessage({ id: 'error.serviceUnavailable' }));
+          } else if (error.isAuthError) {
+            antdMessage.error(intl.formatMessage({ id: 'login.error' }));
+          } else {
+            antdMessage.error(error.message || intl.formatMessage({ id: 'error.unknown' }));
+          }
+        } else {
+          antdMessage.error(intl.formatMessage({ id: 'error.unknown' }));
+        }
       }
     },
     [dispatch, navigate, searchParams, intl],

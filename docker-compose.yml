@@ -1,0 +1,48 @@
+# =============================================================================
+# docker-compose.yml — 生产环境编排
+# 启动: docker compose up -d
+# 查看日志: docker compose logs -f
+# =============================================================================
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: /api
+        VITE_USE_MOCK: "false"
+    image: react-backend:${IMAGE_TAG:-latest}
+    container_name: react-backend
+    ports:
+      - "${HOST_PORT:-80}:80"
+    restart: unless-stopped
+    environment:
+      # 可选：如果需要在运行时覆盖 Nginx 变量，通过 env_file 注入
+      - TZ=Asia/Shanghai
+    networks:
+      - app-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # 健康检查依赖（Kubernetes 场景用 probe，docker compose 场景用健康检查）
+    # depends_on 配合 condition 可等后端就绪（若有后端容器）
+
+  # ---------------------------------------------------------------------------
+  # 可选：后端 Mock 容器（如果 MSW 不够用，或需要真实后端验证）
+  # 取消注释以下区块启用
+  # ---------------------------------------------------------------------------
+  # backend:
+  #   image: your-backend-image:latest
+  #   container_name: react-backend-api
+  #   ports:
+  #     - "8080:8080"
+  #   restart: unless-stopped
+  #   networks:
+  #     - app-network
+
+networks:
+  app-network:
+    driver: bridge
