@@ -93,6 +93,8 @@ export default {
     forbidden: 'Access denied',
     notFound: 'Resource not found',
     serverError: 'Server error, please try again later',
+    requestFailed: 'Request failed',
+    loginExpired: 'Login expired',
     http: {
       400: 'Invalid request parameters',
       403: 'Access denied',
@@ -101,6 +103,16 @@ export default {
       502: 'Service temporarily unavailable, please try again later',
       503: 'Service under maintenance',
       504: 'Gateway timeout, please try again later',
+    },
+    code: {
+      40101: 'Invalid username or password',
+      40102: 'Account has been locked',
+      40103: 'Login expired',
+      40104: 'Login expired',
+      40301: 'Access denied',
+      42201: 'Invalid request parameters',
+      42901: 'Too many requests, please try again later',
+      50001: 'Server error, please try again later',
     },
   },
   notFound: {

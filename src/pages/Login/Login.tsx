@@ -41,7 +41,7 @@ function Login() {
       <div className={styles.loginToolbar}>
         <div className={styles.toolbarGlass}>
           <Dropdown
-            trigger={['click']}
+            trigger={['hover']}
             menu={{
               items: localeItems,
               selectedKeys: [locale],

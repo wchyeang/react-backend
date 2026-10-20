@@ -12,8 +12,8 @@ services:
       args:
         VITE_API_BASE_URL: /api
         VITE_USE_MOCK: "false"
-    image: react-backend:${IMAGE_TAG:-latest}
-    container_name: react-backend
+    image: ${IMAGE_NAME:-react-backend}:${IMAGE_TAG:-latest}
+    container_name: ${IMAGE_NAME:-react-backend}
     ports:
       - "${HOST_PORT:-80}:80"
     restart: unless-stopped

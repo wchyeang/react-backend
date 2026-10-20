@@ -7,13 +7,13 @@ set -euo pipefail
 # ---------------------------------------------------------------------------
 # 配置
 # ---------------------------------------------------------------------------
-IMAGE_NAME="react-backend"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+IMAGE_NAME=$(node -e "console.log(require('$SCRIPT_DIR/package.json').name)" 2>/dev/null || echo "react-backend")
 REGISTRY="${DOCKER_REGISTRY:-}"                              # e.g. harbor.company.com/project
 
 # ---------------------------------------------------------------------------
 # 加载 .env 文件（与 deploy.ps1 同步）
 # ---------------------------------------------------------------------------
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 load_env_file() {
     local file="$1" label="$2"
@@ -69,14 +69,11 @@ EOF
 # 构建镜像
 # ---------------------------------------------------------------------------
 do_build() {
-    echo "==> Cleaning previous build cache..."
-    docker builder prune -f
     echo "==> Building ${FULL_IMAGE} ..."
     docker build \
         --build-arg VITE_API_BASE_URL="${VITE_API_BASE_URL:-/api}" \
         --build-arg VITE_USE_MOCK="${VITE_USE_MOCK:-false}" \
         -t "${FULL_IMAGE}" \
-        -t "${IMAGE_NAME}:latest" \
         -f Dockerfile \
         .
     echo "==> Build complete: ${FULL_IMAGE}"
@@ -101,6 +98,7 @@ do_push() {
 # ---------------------------------------------------------------------------
 do_run() {
     do_build
+    export IMAGE_NAME="${IMAGE_NAME}"
     export IMAGE_TAG="${TAG}"
     export HOST_PORT="${HOST_PORT:-80}"
     echo "==> Starting container..."
@@ -133,14 +131,12 @@ do_lint() {
 # ---------------------------------------------------------------------------
 do_clean() {
     echo "==> Stopping & removing container..."
-    docker rm -f react-backend 2>/dev/null || true
+    docker rm -f ${IMAGE_NAME} 2>/dev/null || true
     echo "==> Removing compose resources..."
     docker compose down -v 2>/dev/null || true
-    echo "==> Removing image ${FULL_IMAGE} ..."
-    docker rmi -f "${IMAGE_NAME}:latest" 2>/dev/null || true
-    if [ "${TAG}" != "latest" ]; then
-        docker rmi -f "${FULL_IMAGE}" 2>/dev/null || true
-    fi
+    echo "==> Removing images ${IMAGE_NAME}:* ..."
+    IMAGES=$(docker images -q "${IMAGE_NAME}:*" 2>/dev/null)
+    if [ -n "${IMAGES}" ]; then echo "${IMAGES}" | xargs docker rmi -f 2>/dev/null || true; fi
     echo "==> Cleaning build cache..."
     docker builder prune -f
     echo "==> Cleaned"

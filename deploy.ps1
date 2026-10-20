@@ -45,12 +45,14 @@ Import-DotEnv -Path (Join-Path $ScriptDir ".env") -Label ".env (base)"
 Import-DotEnv -Path (Join-Path $ScriptDir ".env.production") -Label ".env.production (override)"
 
 $ImageName = "react-backend"
-
-# IMAGE_TAG 默认读取 package.json 的 version 字段，可通过环境变量覆盖
 $PackageVersion = "latest"
+
+# 从 package.json 读取 name 和 version
 $PackageJsonPath = Join-Path $ScriptDir "package.json"
 if (Test-Path $PackageJsonPath) {
-    $PackageVersion = (Get-Content $PackageJsonPath -Raw | ConvertFrom-Json).version
+    $pkg = Get-Content $PackageJsonPath -Raw | ConvertFrom-Json
+    $ImageName = $pkg.name
+    $PackageVersion = $pkg.version
 }
 $ImageTag = if ($env:IMAGE_TAG) { $env:IMAGE_TAG } else { $PackageVersion }
 
@@ -65,14 +67,11 @@ function Exit-IfFailed {
 }
 
 function Invoke-Build {
-    Write-Host "==> Cleaning previous build cache..." -ForegroundColor DarkGray
-    docker builder prune -f 2>$null
     Write-Host "==> Building ${FullImage} ..." -ForegroundColor Cyan
     docker build `
         --build-arg VITE_API_BASE_URL="$($env:VITE_API_BASE_URL)" `
         --build-arg VITE_USE_MOCK="$($env:VITE_USE_MOCK)" `
         -t $FullImage `
-        -t "${ImageName}:latest" `
         -f Dockerfile `
         .
     Exit-IfFailed
@@ -82,6 +81,7 @@ function Invoke-Build {
 function Invoke-Run {
     Invoke-Build
     Write-Host "==> Starting container..." -ForegroundColor Cyan
+    $env:IMAGE_NAME = $ImageName
     $env:IMAGE_TAG = $ImageTag
     $env:HOST_PORT = $HostPort
     docker compose up -d
@@ -96,14 +96,12 @@ function Invoke-Stop {
 
 function Invoke-Clean {
     Write-Host "==> Stopping & removing container..." -ForegroundColor DarkGray
-    docker rm -f react-backend 2>$null
+    docker rm -f $ImageName 2>$null
     Write-Host "==> Removing compose resources..." -ForegroundColor DarkGray
     docker compose down -v 2>$null
-    Write-Host "==> Removing image $FullImage ..." -ForegroundColor DarkGray
-    docker rmi -f "${ImageName}:latest" 2>$null
-    if ($ImageTag -ne "latest") {
-        docker rmi -f $FullImage 2>$null
-    }
+    Write-Host "==> Removing images ${ImageName}:* ..." -ForegroundColor DarkGray
+    $images = docker images -q "${ImageName}:*" 2>$null
+    if ($images) { docker rmi -f $images 2>$null }
     Write-Host "==> Cleaning build cache..." -ForegroundColor DarkGray
     docker builder prune -f
     Write-Host "==> Cleaned" -ForegroundColor Green

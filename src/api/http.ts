@@ -1,6 +1,7 @@
 import axios from 'axios';
 import type { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { authStorage } from '@/utils/authStorage';
+import { getErrorMessage, getAppErrorMessage } from '@/utils/getErrorMessage';
 import { AppError } from '@/types/error';
 import type { ApiResponse } from '@/types/api';
 
@@ -17,6 +18,7 @@ const instance = axios.create({
 let isRefreshing = false;
 let waitingQueue: Array<(token: string) => void> = [];
 
+// 刷新失败回调，默认清空 token；auth store 注册后执行登出跳转
 let onRefreshFail = () => {
   authStorage.clearTokens();
 };
@@ -30,6 +32,7 @@ function isInWhiteList(url?: string) {
   return WHITE_LIST.some((path) => url.includes(path));
 }
 
+// 请求拦截器：白名单外自动注入 accessToken
 instance.interceptors.request.use((config) => {
   if (isInWhiteList(config.url)) return config;
   const token = authStorage.getAccessToken();
@@ -44,6 +47,7 @@ interface TokenPairPayload {
   refreshToken: string;
 }
 
+// 真正刷新 token 的独立请求，避免复用拦截器再次触发刷新
 async function doRefresh() {
   const refreshToken = authStorage.getRefreshToken();
   if (!refreshToken) {
@@ -53,13 +57,18 @@ async function doRefresh() {
     refreshToken,
   });
   if (data.code !== 0) {
-    throw new Error(data.message);
+    throw new AppError(
+      data.message || getErrorMessage('error.loginExpired'),
+      data.code,
+      'business',
+    );
   }
   authStorage.setAccessToken(data.data.accessToken);
   authStorage.setRefreshToken(data.data.refreshToken);
   return data.data.accessToken;
 }
 
+// 单次刷新 + 等待队列重放
 function retryAfterRefresh(config: AxiosRequestConfig) {
   if (!isRefreshing) {
     isRefreshing = true;
@@ -84,19 +93,28 @@ function retryAfterRefresh(config: AxiosRequestConfig) {
   });
 }
 
+/** 错误分类并抛出，不弹消息（由全局兜底拦截器统一展示） */
 function throwAppError(code: number, serverMessage?: string): never {
-  // HTTP 5xx
   if (code >= 500) {
-    throw new AppError('服务暂时不可用，请稍后重试', code, 'http', code);
+    throw new AppError(
+      getAppErrorMessage(code, serverMessage, 'error.serviceUnavailable'),
+      code,
+      'http',
+      code,
+    );
   }
-  // HTTP 4xx（401 在上层由 token 刷新处理）
   if (code >= 400) {
-    throw new AppError(serverMessage || '请求失败', code, 'http', code);
+    throw new AppError(
+      getAppErrorMessage(code, serverMessage, 'error.requestFailed'),
+      code,
+      'http',
+      code,
+    );
   }
-  // 业务错误码（后端 code !== 0）
-  throw new AppError(serverMessage || '系统繁忙，请稍后重试', code, 'business');
+  throw new AppError(getAppErrorMessage(code, serverMessage), code, 'business');
 }
 
+// 响应拦截器 ①：统一业务码处理 + 401 自动刷新
 instance.interceptors.response.use(
   (response) => {
     const apiData = response.data as ApiResponse;
@@ -117,12 +135,23 @@ instance.interceptors.response.use(
     }
     // 网络层错误（无任何响应）
     if (!error.response) {
-      throw new AppError('网络连接失败，请检查网络', 0, 'network');
+      throw new AppError(getErrorMessage('error.network'), 0, 'network');
     }
     throwAppError(status ?? 0, error.response?.data?.message);
   },
 );
 
+// 响应拦截器 ②：全局兜底 — 对所有 AppError 自动弹出错误提示
+instance.interceptors.response.use(undefined, async (error) => {
+  if (error instanceof AppError) {
+    // 动态导入避免循环依赖，延迟执行确保 message 已挂载
+    const { message } = await import('antd');
+    setTimeout(() => message.error(error.message), 100);
+  }
+  return Promise.reject(error);
+});
+
+// 泛型请求封装
 export function request<T>(config: AxiosRequestConfig): Promise<T> {
   return instance.request(config) as Promise<T>;
 }
