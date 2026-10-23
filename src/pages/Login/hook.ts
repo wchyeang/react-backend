@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 import { useIntl } from 'react-intl';
 import { useAppDispatch } from '@/store/hooks';
@@ -15,12 +15,20 @@ export function useLogin() {
   const [searchParams] = useSearchParams();
   const intl = useIntl();
   const dispatch = useAppDispatch();
+  const [loading, setLoading] = useState(false);
 
   const handleFinish: FormProps<LoginFormValues>['onFinish'] = useCallback(
     async (values) => {
-      await dispatch(loginThunk(values));
-      const redirect = searchParams.get('redirect') || '/dashboard';
-      navigate(redirect, { replace: true });
+      setLoading(true);
+      try {
+        await dispatch(loginThunk(values));
+        const redirect = searchParams.get('redirect') || '/dashboard';
+        navigate(redirect, { replace: true });
+      } catch {
+        // 错误已由全局拦截器统一提示，此处仅阻止异常冒泡
+      } finally {
+        setLoading(false);
+      }
     },
     [dispatch, navigate, searchParams],
   );
@@ -36,6 +44,7 @@ export function useLogin() {
     passwordLabel: intl.formatMessage({ id: 'login.password' }),
     submitLabel: intl.formatMessage({ id: 'login.submit' }),
     rememberLabel: intl.formatMessage({ id: 'login.remember' }),
+    loading,
     handleFinish,
   };
 }

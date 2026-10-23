@@ -25,6 +25,7 @@ function Login() {
     passwordLabel,
     submitLabel,
     rememberLabel,
+    loading,
     handleFinish,
   } = useLogin();
   const dispatch = useAppDispatch();
@@ -116,6 +117,7 @@ function Login() {
             onFinish={handleFinish}
             size="large"
             autoComplete="off"
+            disabled={loading}
             className={styles.loginForm}
           >
             <Form.Item name="username" rules={[{ required: true, message: usernameLabel }]}>
@@ -142,7 +144,13 @@ function Login() {
             </div>
 
             <Form.Item>
-              <Button type="primary" htmlType="submit" block className={styles.submitBtn}>
+              <Button
+                type="primary"
+                htmlType="submit"
+                block
+                loading={loading}
+                className={styles.submitBtn}
+              >
                 {submitLabel}
               </Button>
             </Form.Item>
